@@ -17,32 +17,23 @@
 package org.energyos.espi.datacustodian.web.customer;
 
 import org.energyos.espi.datacustodian.domain.Configuration;
+import org.energyos.espi.datacustodian.domain.Routes;
 import org.energyos.espi.datacustodian.domain.ThirdParty;
 import org.energyos.espi.datacustodian.service.ThirdPartyService;
 import org.energyos.espi.datacustodian.utils.factories.EspiFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ScopeSelectionControllerTests {
+public class ApproveAuthorizationControllerTests {
 
     @Test
-    public void scopeSelection() throws Exception {
-        ScopeSelectionController controller = new ScopeSelectionController();
+    public void approveAuthorization() throws Exception {
+        ApproveAuthorizationController controller = new ApproveAuthorizationController();
 
-        ThirdParty thirdParty = EspiFactory.newThirdParty();
-        thirdParty.setUrl("http://localhost:8080/ThirdParty/RetailCustomer/ScopeSelection");
-
-        ThirdPartyService thirdPartyService = mock(ThirdPartyService.class);
-        controller.setThirdPartyService(thirdPartyService);
-        when(thirdPartyService.findByClientId(thirdParty.getClientId())).thenReturn(thirdParty);
-
-        String redirectURL = controller.scopeSelection(new String[]{"scope1", "scope2"}, thirdParty.getClientId());
-
-        assertEquals(String.format("redirect:%s?scope=%s&scope=%s&scope=%s&DataCustodianID=%s", thirdParty.getUrl(),
-                Configuration.SCOPES[0], Configuration.SCOPES[1], Configuration.SCOPES[2], Configuration.DATA_CUSTODIAN_ID),
-                redirectURL);
+        assertEquals(Routes.AuthorizationServerAuthorizationEndpoint, controller.approveAuthorization());
     }
 }

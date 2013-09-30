@@ -17,6 +17,7 @@
 package org.energyos.espi.datacustodian.integration.web;
 
 import org.energyos.espi.datacustodian.domain.Configuration;
+import org.energyos.espi.datacustodian.domain.Routes;
 import org.energyos.espi.datacustodian.domain.ThirdParty;
 import org.energyos.espi.datacustodian.service.ThirdPartyService;
 import org.energyos.espi.datacustodian.utils.factories.EspiFactory;
@@ -34,13 +35,14 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration("/spring/test-context.xml")
 @Transactional
-public class ScopeSelectionTests {
+public class ApproveAuthorizatonTests {
 
     private MockMvc mockMvc;
 
@@ -56,20 +58,26 @@ public class ScopeSelectionTests {
     }
 
     @Test
-    public void index_returnsRedirectStatus() throws Exception {
-        mockMvc.perform(get("/RetailCustomer/ScopeSelection").param("scope", "scope1").param("scope", "scope2").param("ThirdPartyID", "thirdParty"))
-                .andExpect(status().is(302));
+    public void approveAuthorization_returnOkStatus() throws Exception {
+        mockMvc.perform(get(Routes.AuthorizationServerAuthorizationEndpoint))
+                .andExpect(status().isOk());
     }
 
     @Test
-    public void index_redirectsToThirdParty() throws Exception {
-        ThirdParty thirdParty = EspiFactory.newThirdParty();
-        thirdParty.setName("ThirdParty");
-        thirdParty.setUrl("http://localhost:8080/ThirdParty/RetailCustomer/ScopeSelection");
-        thirdPartyService.persist(thirdParty);
-
-        mockMvc.perform(get("/RetailCustomer/ScopeSelection").param("scope", "scope1").param("scope", "scope2").param("ThirdPartyID", thirdParty.getId().toString()))
-                .andExpect(redirectedUrl(String.format("%s?scope=%s&scope=%s&scope=%s&DataCustodianID=%s", thirdParty.getUrl(),
-                        Configuration.SCOPES[0], Configuration.SCOPES[1], Configuration.SCOPES[2], Configuration.DATA_CUSTODIAN_ID)));
+    public void approveAuthorization_displaysApproveAuthorizationView() throws Exception {
+        mockMvc.perform(get(Routes.AuthorizationServerAuthorizationEndpoint))
+                .andExpect(view().name(Routes.AuthorizationServerAuthorizationEndpoint));
     }
+
+//    @Test
+//    public void index_redirectsToThirdParty() throws Exception {
+//        ThirdParty thirdParty = EspiFactory.newThirdParty();
+//        thirdParty.setName("ThirdParty");
+//        thirdParty.setUrl("http://localhost:8080/ThirdParty/RetailCustomer/ScopeSelection");
+//        thirdPartyService.persist(thirdParty);
+//
+//        mockMvc.perform(get("/RetailCustomer/ScopeSelection").param("scope", "scope1").param("scope", "scope2").param("ThirdPartyID", thirdParty.getId().toString()))
+//                .andExpect(redirectedUrl(String.format("%s?scope=%s&scope=%s&scope=%s&DataCustodianID=%s", thirdParty.getUrl(),
+//                        Configuration.SCOPES[0], Configuration.SCOPES[1], Configuration.SCOPES[2], Configuration.DATA_CUSTODIAN_ID)));
+//    }
 }
